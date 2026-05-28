@@ -1,11 +1,11 @@
 # Building an API with the "net/http" Package
+![GoLang Net Package](/images/002_golang-net-package.png)    
 ---
 ## The Net Package
-![GoLang Net Package](/images/002_golang-net-package.png)
 Package net provides a portable interface for network I/O, including TCP/IP, UDP, domain name resolution, and Unix domain sockets.    
 [Net Package Documentation](https://pkg.go.dev/net)
 
-#### Basic TCP Input/Output
+### Basic TCP Input/Output
 
 The Dial function opens a connection to a server `net.Dial("tcp", "golang.org:80")`    
 [Example: Dial Function](Example-Dial_Function.go)    
@@ -15,9 +15,9 @@ The Listen function creates server listeners to recieve connections `net.Listen(
 
 After a connection is opened between our client and server, input/output can be sent or recieved on both sides    
 
-## net/http
+# net/http
 
-While it is possible to use basic input/output to handle/send hand written http requests, there is no need to recreate the wheel, the [net/http](https://pkg.go.dev/net/http) package has everything we need for http input/output without needing to write all the protocols bits and pieces.    
+While it is possible to use basic input/output to handle/send hand written http requests, there is no need to recreate the wheel, the net/http package has everything we need for http input/output without needing to write all the protocols bits and pieces.    
 [net/http Package Documentation](https://pkg.go.dev/net/http)    
 
 The Get function creates a connection to the server and performs a get request `resp, err := http.Get("https://golang.org")`    
@@ -35,18 +35,20 @@ log.Fatal(http.ListenAndServe(":8080", nil))
 paths must be mapped to functions before starting the server because the ListenAndServe function blocks further execution   
 [Example: HTTP Server](Example-HTTP_Server.go)    
 
-#### Routing
+## Routing
 
 **What is a Mux**    
 A mux or a Multiplexer, is an http request router.    
 when using functions like HandleFunc or ListenAndServ, if you dont apply a custom mux, then go uses the default global mux    
+
 this is fine in simple applications however when you need to do more complex routing you will want to use a custom built mux    
-there are security concerns around using the default global mux since it is shared globally, which means routes can potentially conflict with imported packages, a custom mux is separate from the global scope and has the routes specified to it.    
+
+there are also security concerns around using the default global mux since it is shared globally, which means routes can potentially conflict with imported packages, a custom mux is separate from the global scope and has the routes specified to it.    
 
 To create a custom mux we use `router := http.NewServeMux()`    
 We can then call functions from the new mux like `router.HandleFunc()`    
 
-**Request Methods**    
+**HTTP Request Methods**    
 by default, if unspecified, all methods are valid in a route, however we may wanna limit them, or do different things with different methods.    
 we can do this by specifying which method we want before the routes path like so `router.HandleFunc("GET /path", Handler)`    
 
@@ -62,7 +64,7 @@ router.HandleFunc("GET /products/{id}", func(w http.ResponseWriter, r *http.Requ
 ```
 
 
-#### Middleware
+## Middleware
 
 Middleware is software that is run while processing a request, it takes an `http.handler` and returns a new `http.handler`.    
 Commonly used for injecting headers, validating authentication, and logging requests.    
@@ -74,21 +76,21 @@ Middleware can be nested and chained together like so
     Manual chaining (executes in order: Logger -> Auth -> Handler)
 */
 
-// for specific paths
-http.HandleFunc("/path", Logger(Auth(Handler)))
+// for specific paths, middlewares expect an http.Handler interface so we convert our Handler function with http.HandlerFunc()
+http.HandleFunc("/path", Logger(Auth(http.HandlerFunc(Handler))))
 
 // for every request
 http.ListenAndServe(":8080", Logger(Auth(Handler)))
 ```
 [Example: Middleware](Example-Middleware.go)
 
-#### JSON in Go
+## JSON in Go
 In Go, JSON handling is managed through the "encoding/json" package. The primary methods for interacting with JSON are Marshalling (converting Go types to JSON) and Unmarshalling (converting JSON to Go types)    
 To convert a Go struct into JSON, use `json.Marshal`. To parse JSON back into a struct, use `json.Unmarshal`    
 [Example: Marshalling and Unmarshalling JSON](Example-Marshalling.go)   
 
 
-#### Putting it all Together
+# Putting it all Together
 
 we now have all the necessary bits and pieces needed to create a REST API.    
 Normally we would want to connect a database to handle our data but for simplicity we will store it in memory    
