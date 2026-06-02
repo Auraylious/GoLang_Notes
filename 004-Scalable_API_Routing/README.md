@@ -1,6 +1,5 @@
 # Scalable API Routing
-![Scalable API Routing](/images/004-scalable_apis.png)    
-lets face it, putting all your routes in one file can be hectic to sort through, especially if you have other components in the same file like your middlewares, and your websocket logic etc etc.    
+Lets face it, putting everything into one file can be hectic to sort through, especially if you have other components in the same file like your middlewares, and your websocket logic etc etc.    
 
 lets organize things for better scalability early on so we can better focus on the specific thing at hand when updating it later.   
 
